@@ -28,13 +28,27 @@ class AuthorizationPage(Tk):
         password_ent = ttk.Entry(users_data_frame)
         password_ent.pack(pady=(0, 20))
 
-        submit_btn = Button(text="Войти")
+        submit_btn = Button(
+            text="Войти",
+            width=20,
+            height=2,
+            bd=1,
+            relief=RIDGE
+        )
         submit_btn.pack(pady=(30, 0))
+
+
+        registration_btn = Button(
+            text="Зарегистрироваться",
+            width=20,
+            height=2,
+            bd=1,
+            relief=RIDGE
+        )
+        registration_btn.pack(pady=(20, 0))
+
         submit_btn_error_text_lbl = ttk.Label(textvariable=self.submit_error_text)
         submit_btn_error_text_lbl.pack()
-
-        registration_btn = Button(text="Зарегистрироваться")
-        registration_btn.pack(pady=(20, 0))
 
 
 if __name__ == "__main__":
