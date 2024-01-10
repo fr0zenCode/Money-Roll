@@ -1,6 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 
+from connection import Connection
+from settings import database, user, password
+
 
 class AuthorizationPage(Tk):
 
@@ -11,6 +14,9 @@ class AuthorizationPage(Tk):
         self.geometry("600x400")
 
         self.submit_error_text = StringVar()
+
+        self.connection = None
+        self.start_connection_to_db()
 
         users_data_frame = Frame(borderwidth=1, relief=SOLID)
         users_data_frame.pack(pady=(20, 0))
@@ -37,7 +43,6 @@ class AuthorizationPage(Tk):
         )
         submit_btn.pack(pady=(30, 0))
 
-
         registration_btn = Button(
             text="Зарегистрироваться",
             width=20,
@@ -49,6 +54,10 @@ class AuthorizationPage(Tk):
 
         submit_btn_error_text_lbl = ttk.Label(textvariable=self.submit_error_text)
         submit_btn_error_text_lbl.pack()
+
+    def start_connection_to_db(self):
+        self.connection = Connection()
+        self.connection.make_connection(user=user, password=password, database=database)
 
 
 if __name__ == "__main__":
