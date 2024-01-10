@@ -12,6 +12,7 @@ class User:
         self.user_id = None
         self.first_name = None
         self.last_name = None
+        self.user_email = None
 
         self.__password = None
         self.__balance = None
@@ -71,10 +72,7 @@ class User:
         pass
 
 
-
 def main():
-
-
 
     player = User()
 
