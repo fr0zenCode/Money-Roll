@@ -4,23 +4,29 @@ from random import choice
 
 class User:
 
-    def __init__(self):
+    def __init__(self, login, user_id, first_name, last_name, email, password, balance, chance_for_big_win):
 
         self.auth = False
 
-        self.login = None
-        self.user_id = None
-        self.first_name = None
-        self.last_name = None
-        self.user_email = None
+        self.login = login
+        self.user_id = user_id
+        self.first_name = first_name
+        self.last_name = last_name
+        self.user_email = email
 
-        self.__password = None
-        self.__balance = None
+        self.__password = password
+        self._balance = balance
 
-        self.__chance_for_big_win = None
+        self._chance_for_big_win = chance_for_big_win
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}, id: {self.user_id}'
+
+    def get_password(self):
+        return self.__password
+
+
+
 
     def log_in(self):
 
@@ -33,7 +39,7 @@ class User:
         else:
             return
 
-        with open('bd.txt') as file:
+        with open('../bd.txt') as file:
             for string in file:
                 index = string.find(':')
                 if login == string[:index]:
