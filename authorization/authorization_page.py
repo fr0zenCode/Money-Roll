@@ -35,7 +35,7 @@ class AuthorizationPage(Tk):
 
         password_name_lbl = ttk.Label(users_data_frame, text="Введите пароль:")
         password_name_lbl.pack(pady=(10, 0))
-        password_ent = ttk.Entry(users_data_frame)
+        password_ent = ttk.Entry(users_data_frame, show="•")
         password_ent.pack(pady=(0, 20))
 
         submit_btn = Button(
