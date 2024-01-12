@@ -15,7 +15,7 @@ class User:
         self.user_email = email
 
         self.__password = password
-        self._balance = balance
+        self.__balance = balance
 
         self._chance_for_big_win = chance_for_big_win
 
@@ -25,8 +25,14 @@ class User:
     def get_password(self):
         return self.__password
 
+    def get_balance(self):
+        return self.__balance
 
+    def take_money_for_game(self):
+        self.__balance -= 50
 
+    def increase_balance(self, money):
+        self.__balance += money
 
     def log_in(self):
 
