@@ -1,15 +1,16 @@
 from random import random
-from golden_item import GoldenItem
-from red_item import RedItem
-from purple_item import PurpleItem
-from dark_purple import DarkPurpleItem
-from blue_item import BlueItem
-# from main import current_win_label, total_win_label
+
+from items.golden_item import GoldenItem
+from items.red_item import RedItem
+from items.purple_item import PurpleItem
+from items.dark_purple_item import DarkPurpleItem
+from items.blue_item import BlueItem
 
 
 class Game:
 
-    def __init__(self):
+    def __init__(self, player):
+        self.player = player
         self.total = 0
         self.total_win_text = ""
         self.current_win_text = ""
@@ -35,50 +36,16 @@ class Game:
 
         return self._make_drop(BlueItem)
 
-    def run(self):
+    def get_prize(self):
 
         item = self._choose_item()
-        self.total -= 50
-        self.total += item
-
-        bad_result = f'Вы в МИНУСЕ на {self.total * -1} рублей. Позор, лудоман!'
-        good_result = f'Вы в ПЛЮСЕ на {self.total} рублей.'
-        text = f'Вы выиграли {item} рублей! Поздравляем!\n\n{bad_result if self.total < 0 else good_result}\n\n'
-
-
+        self.player.take_money_for_game()
+        self.total += item[0]
         self.current_win_text = f"Поздравляем! Вы выиграли {item} рублей."
 
-
-
-
-
-    def start(self):
-
-        count_for_test = 0
-
-        while True:
-            bad_result = f'Вы в МИНУСЕ на {self.total * -1} рублей. Позор, лудоман!'
-            good_result = f'Вы в ПЛЮСЕ на {self.total} рублей.'
-            text = f'{bad_result if self.total < 0 else good_result} \n\n1. Крутить \n2. Закончить игру \n\nВаш ответ: '
-
-
-
-            # if count_for_test < 10:
-            #     answer = '1'
-            #     count_for_test += 1
-            # else:
-            #     answer = input(text)
-
-            if answer == '2':
-                return
-
-            if answer == '1':
-                item = self._choose_item()
-                self.total -= 50
-                self.total += item
-                print(f'Вы выиграли {item} рублей')
+        return item
 
 
 if __name__ == '__main__':
-    game = Game()
-    game.start()
+    game = Game("player")
+    game.run()
