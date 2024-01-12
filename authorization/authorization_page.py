@@ -6,6 +6,7 @@ import registration_page
 
 from connection import Connection
 from settings import database, user, password
+from main import MainWindow
 
 
 class AuthorizationPage(Tk):
@@ -90,7 +91,8 @@ class AuthorizationPage(Tk):
                 users_data[2],
                 users_data[3],
                 users_data[4],
-                users_data[5]
+                users_data[5],
+                users_data[6]
             )
             print(f'Поздравляем! Вы авторизованы! \n'
                   f'Ваш идентификатор в системе: {self.player.user_id} \n'
@@ -124,7 +126,9 @@ class AuthorizationPage(Tk):
     ):
         self.player = User(login, user_id, first_name, last_name, email, user_password, balance, chance_for_big_win)
         self.player.auth = True
-        return True
+        self.destroy()
+        main_window_var = MainWindow(self.player)
+        main_window_var.mainloop()
 
 
 if __name__ == "__main__":
