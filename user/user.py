@@ -90,28 +90,7 @@ def main():
 
     player.log_in()
 
-    # text = "1. Авторизоваться \n2. Зарегистрироваться \n\nВаш ответ: "
-    #
-    # while not player.auth:
-    #
-    #     users_answer = input(text)
-    #
-    #     if users_answer == "1":
-    #         player.log_in()
-    #     if users_answer == "2":
-    #         player.sign_in()
-    #
-    #
-    #
-    #
-    # first_names = ['Иван', 'Илья', 'Емиль', 'Чингизхан', 'Вячеслав']
-    # last_names = ['Жигун', 'Иванов', 'Багиров', 'Чурка', 'Разуваев']
-    # user_id = UUID('{12345678-1234-5678-1234-567812345678}')
-    # password = 'Password123'
-    # balance = 0
-    # chance_for_big_win = 0
-    # user = User(choice(first_names), choice(last_names), password, balance, chance_for_big_win, user_id)
-    # print(user)
+
 
 
 if __name__ == '__main__':
