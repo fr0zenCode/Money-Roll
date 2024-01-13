@@ -66,7 +66,12 @@ class AuthorizationPage(Tk):
         users_data_frame = Frame(content_frame, borderwidth=1, relief=SOLID, background=self.background_color)
         users_data_frame.pack(pady=(20 * self.percentage_height_from_full_hd, 0))
 
-        users_data_frame_name = ttk.Label(users_data_frame, text="Авторизация пользователя", font=font_for_h1_lbl, background=self.background_color)
+        users_data_frame_name = ttk.Label(
+            users_data_frame,
+            text="Авторизация пользователя",
+            font=font_for_h1_lbl,
+            background=self.background_color
+        )
         users_data_frame_name.pack(
             pady=(20 * self.percentage_height_from_full_hd, 20 * self.percentage_width_from_full_hd),
             padx=20 * self.percentage_width_from_full_hd
@@ -82,7 +87,12 @@ class AuthorizationPage(Tk):
         label = ttk.Label(users_data_frame, image=self.new_image, background=self.background_color)
         label.pack(pady=(0, 20 * self.percentage_height_from_full_hd))
 
-        email_name_lbl = ttk.Label(users_data_frame, text="Введите email:", font=font_for_lbl, background=self.background_color)
+        email_name_lbl = ttk.Label(
+            users_data_frame,
+            text="Введите email:",
+            font=font_for_lbl,
+            background=self.background_color
+        )
         email_name_lbl.pack(pady=(0, 5 * self.percentage_height_from_full_hd))
         email_ent = ttk.Entry(
             users_data_frame,
@@ -93,7 +103,12 @@ class AuthorizationPage(Tk):
         )
         email_ent.pack(padx=20 * self.percentage_width_from_full_hd)
 
-        password_name_lbl = ttk.Label(users_data_frame, text="Введите пароль:", font=font_for_lbl, background=self.background_color)
+        password_name_lbl = ttk.Label(
+            users_data_frame,
+            text="Введите пароль:",
+            font=font_for_lbl,
+            background=self.background_color
+        )
         password_name_lbl.pack(
             pady=(10 * self.percentage_height_from_full_hd, 5 * self.percentage_height_from_full_hd)
         )
@@ -128,7 +143,9 @@ class AuthorizationPage(Tk):
             font=font_for_lbl,
             command=lambda: self.switch_to_registration_page()
         )
-        registration_btn.pack(pady=(20 * self.percentage_height_from_full_hd, 30 * self.percentage_height_from_full_hd))
+        registration_btn.pack(
+            pady=(20 * self.percentage_height_from_full_hd, 30 * self.percentage_height_from_full_hd)
+        )
 
         submit_btn_error_text_lbl = ttk.Label(textvariable=self.submit_error_text)
         submit_btn_error_text_lbl.pack()
