@@ -7,6 +7,8 @@ from functions import get_percentage_of_screen_size_from_full_hd_size
 
 from connection import Connection
 from settings import database, user, password
+from main import MainWindow
+import authorization_page
 
 
 class RegistrationPage(Tk):
@@ -27,7 +29,7 @@ class RegistrationPage(Tk):
         # screen sizes
         self.percentage_width_from_full_hd = get_percentage_of_screen_size_from_full_hd_size(self)[0] / 100
         self.percentage_height_from_full_hd = get_percentage_of_screen_size_from_full_hd_size(self)[1] / 100
-
+        self.minsize(int(500 * self.percentage_width_from_full_hd), int(500 * self.percentage_height_from_full_hd))
         self.configure(background=self.background_color)
 
         # validate methods
@@ -76,7 +78,7 @@ class RegistrationPage(Tk):
         login_name_lbl = ttk.Label(users_data_frame, text="Придумайте Логин", font=self.font_for_lbl)
         login_name_lbl.pack(pady=(20, 10))
 
-        login_ent = ttk.Entry(
+        self.login_ent = ttk.Entry(
             users_data_frame,
             width=int(50 * self.percentage_width_from_full_hd),
             justify=CENTER,
@@ -85,38 +87,38 @@ class RegistrationPage(Tk):
             validatecommand=self.login_entry_validate_method
         )
 
-        login_ent.pack()
+        self.login_ent.pack()
         login_error_text_lbl = ttk.Label(users_data_frame, textvariable=self.login_error_text_message)
         login_error_text_lbl.pack()
 
         first_name_name_lbl = ttk.Label(users_data_frame, text="Ваше имя", font=self.font_for_lbl)
         first_name_name_lbl.pack(pady=(10, 10))
 
-        first_name_ent = ttk.Entry(
+        self.first_name_ent = ttk.Entry(
             users_data_frame,
             width=int(50 * self.percentage_width_from_full_hd),
             justify=CENTER,
             font=self.font_for_entries
         )
 
-        first_name_ent.pack()
+        self.first_name_ent.pack()
 
         last_name_name_lbl = ttk.Label(users_data_frame, text="Ваша фамилия", font=self.font_for_lbl)
         last_name_name_lbl.pack(pady=(20, 10))
 
-        last_name_ent = ttk.Entry(
+        self.last_name_ent = ttk.Entry(
             users_data_frame,
             width=int(50 * self.percentage_width_from_full_hd),
             justify=CENTER,
             font=self.font_for_entries,
         )
 
-        last_name_ent.pack(padx=(20 * self.percentage_width_from_full_hd))
+        self.last_name_ent.pack(padx=(20 * self.percentage_width_from_full_hd))
 
         user_email_name_lbl = Label(users_data_frame, text="Ваш адрес электронной почты", font=self.font_for_lbl)
         user_email_name_lbl.pack(pady=(20, 10), padx=40)
 
-        email_ent = ttk.Entry(
+        self.email_ent = ttk.Entry(
             users_data_frame,
             width=int(50 * self.percentage_width_from_full_hd),
             justify=CENTER,
@@ -125,34 +127,34 @@ class RegistrationPage(Tk):
             validatecommand=self.email_entry_validate_method
         )
 
-        email_ent.pack()
+        self.email_ent.pack()
 
         user_password_name_lbl = ttk.Label(users_data_frame, text="Придумайте пароль", font=self.font_for_lbl)
         user_password_name_lbl.pack(pady=(20, 10))
 
-        password_ent = ttk.Entry(
+        self.password_ent = ttk.Entry(
             users_data_frame,
             width=int(50 * self.percentage_width_from_full_hd),
             justify=CENTER,
             font=self.font_for_entries
         )
 
-        password_ent.pack()
+        self.password_ent.pack()
 
         # confirm password
         user_confirm_password_name_lbl = ttk.Label(users_data_frame, text="Повторите пароль", font=self.font_for_lbl)
         user_confirm_password_name_lbl.pack(pady=(20, 10))
 
-        confirm_password_ent = ttk.Entry(
+        self.confirm_password_ent = ttk.Entry(
             users_data_frame,
             width=int(50 * self.percentage_width_from_full_hd),
             justify=CENTER,
             font=self.font_for_entries
         )
-        confirm_password_ent.pack(pady=(0, 20 * self.percentage_height_from_full_hd))
+        self.confirm_password_ent.pack(pady=(0, 20 * self.percentage_height_from_full_hd))
 
         # registration button
-        self.registration_btn = Button(content_frame, text="Зарегистрироваться")
+        self.registration_btn = Button(content_frame, text="Зарегистрироваться", command=self.registration_btn_action)
         self.registration_btn.pack(
             pady=(20 * self.percentage_height_from_full_hd, 20 * self.percentage_height_from_full_hd)
         )
@@ -163,10 +165,51 @@ class RegistrationPage(Tk):
         authorization_page_var.mainloop()
 
     def registration_btn_action(self):
-        pass
+        if not self.check_all_entries():
+            print("Не все поля заполнены")
+            return
+        if not self.check_password():
+            print("Пароли не совпадают")
+            return
+        self.registrate_new_user()
+        self.destroy()
+        authorization_page_to_redirect = authorization_page.AuthorizationPage()
+        authorization_page_to_redirect.mainloop()
 
     def registrate_new_user(self):
-        pass
+
+        # user data
+        login = self.login_ent.get()
+        first_name = self.first_name_ent.get()
+        last_name = self.last_name_ent.get()
+        email = self.email_ent.get()
+        password = self.password_ent.get()
+        balance = 0
+
+        if self.connection is None:
+            self.start_connection_to_db()
+
+        self.connection.get_cursor().execute(
+            f"""INSERT INTO "authorization-data" (login, first_name, last_name, email, password, balance) 
+            VALUES ('{login}', '{first_name}', '{last_name}', '{email}', '{password}', '{balance}')"""
+        )
+
+        self.connection.get_connection().commit()
+
+    def check_password(self):
+        if self.password_ent.get() == self.confirm_password_ent.get():
+            return True
+        return False
+
+    def check_all_entries(self):
+        if (self.login_ent.get()
+                and self.first_name_ent
+                and self.last_name_ent
+                and self.email_ent
+                and self.password_ent
+                and self.confirm_password_ent):
+            return True
+        return False
 
     def validate_email_entry(self, email):
         if self.connection is None:
@@ -190,7 +233,7 @@ class RegistrationPage(Tk):
         parameter_in_db = None
         if email_type:
             parameter_in_db = "email"
-        else:
+        elif login_type:
             parameter_in_db = "login"
 
         self.connection.get_cursor().execute(
