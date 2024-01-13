@@ -73,7 +73,7 @@ class AuthorizationPage(Tk):
         self.player = None
 
         # validate command
-        self.entries_validate_method = (self.register(self.validate_entries), '%d')
+        self.entries_validate_method = (self.register(self.validate_entries), '%P')
 
         content_frame = Frame(background=self.background_color)
         content_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
@@ -115,9 +115,8 @@ class AuthorizationPage(Tk):
             font=font_for_entries,
             justify=CENTER,
             background=self.background_color,
-            validate="all",
-            validatecommand=self.entries_validate_method,
-            textvariable=self.entry1_var
+            validate="key",
+            validatecommand=self.entries_validate_method
         )
         self.email_ent.pack(padx=20 * self.percentage_width_from_full_hd)
 
@@ -137,9 +136,8 @@ class AuthorizationPage(Tk):
             font=font_for_entries,
             justify=CENTER,
             background=self.background_color,
-            validate="all",
-            validatecommand=self.entries_validate_method,
-            textvariable=self.entry2_var
+            validate="key",
+            validatecommand=self.entries_validate_method
         )
         self.password_ent.pack(pady=(0, 20 * self.percentage_height_from_full_hd))
 
@@ -175,12 +173,13 @@ class AuthorizationPage(Tk):
         submit_btn_error_text_lbl = ttk.Label(textvariable=self.submit_error_text)
         submit_btn_error_text_lbl.pack()
 
-    def validate_entries(self, d):
-        if d == "1" or d == "0" or d == "-1":
-            if self.entry1_var.get() and self.entry2_var.get():
-                self.submit_btn.configure(state=NORMAL)
-            else:
-                self.submit_btn.configure(state=DISABLED)
+    def validate_entries(self, text):
+        if (len(text) > 0 and len(self.email_ent.get()) > 0) or (len(text) > 0 and len(self.password_ent.get()) > 0):
+            self.submit_btn.configure(state=NORMAL)
+        elif not self.email_ent.get() or not self.password_ent.get() or len(text) == 0:
+            self.submit_btn.configure(state=DISABLED)
+        else:
+            self.submit_btn.configure(state=NORMAL)
         return True
 
     def start_connection_to_db(self):
