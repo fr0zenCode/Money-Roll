@@ -5,19 +5,34 @@ import tkinter.font as tk_font
 import authorization_page
 from functions import get_percentage_of_screen_size_from_full_hd_size
 
+from connection import Connection
+from settings import database, user, password
+
 
 class RegistrationPage(Tk):
 
     def __init__(self):
         super().__init__()
 
+        # PostreSQL connection
+        self.connection = None
+
         # window settings
         self.title("Регистрация")
         self.state("zoomed")
 
+        # colors
+        self.background_color = "#EDE9E6"
+
         # screen sizes
         self.percentage_width_from_full_hd = get_percentage_of_screen_size_from_full_hd_size(self)[0] / 100
         self.percentage_height_from_full_hd = get_percentage_of_screen_size_from_full_hd_size(self)[1] / 100
+
+        self.configure(background=self.background_color)
+
+        # validate methods
+        self.email_entry_validate_method = (self.register(self.validate_email_entry), "%P")
+        self.login_entry_validate_method = (self.register(self.validate_login_entry), "%P")
 
         # fonts
         self.font_for_entries = tk_font.Font(
@@ -45,7 +60,7 @@ class RegistrationPage(Tk):
         self.login_error_text_message = StringVar()
 
         # main frame
-        content_frame = Frame()
+        content_frame = Frame(background=self.background_color)
         content_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
 
         back_btn = Button(
@@ -53,9 +68,9 @@ class RegistrationPage(Tk):
             text="Назад",
             command=self.back_btn_action
         )
-        back_btn.pack(anchor=NW, pady=10, padx=(20, 0))
+        back_btn.pack(anchor=NW, pady=10 * self.percentage_height_from_full_hd)
 
-        users_data_frame = Frame(content_frame, borderwidth=1, relief=SOLID)
+        users_data_frame = Frame(content_frame, borderwidth=1, relief=SOLID, background=self.background_color)
         users_data_frame.pack()
 
         login_name_lbl = ttk.Label(users_data_frame, text="Придумайте Логин", font=self.font_for_lbl)
@@ -65,7 +80,9 @@ class RegistrationPage(Tk):
             users_data_frame,
             width=int(50 * self.percentage_width_from_full_hd),
             justify=CENTER,
-            font=self.font_for_entries
+            font=self.font_for_entries,
+            validate="all",
+            validatecommand=self.login_entry_validate_method
         )
 
         login_ent.pack()
@@ -94,7 +111,7 @@ class RegistrationPage(Tk):
             font=self.font_for_entries,
         )
 
-        last_name_ent.pack()
+        last_name_ent.pack(padx=(20 * self.percentage_width_from_full_hd))
 
         user_email_name_lbl = Label(users_data_frame, text="Ваш адрес электронной почты", font=self.font_for_lbl)
         user_email_name_lbl.pack(pady=(20, 10), padx=40)
@@ -103,7 +120,9 @@ class RegistrationPage(Tk):
             users_data_frame,
             width=int(50 * self.percentage_width_from_full_hd),
             justify=CENTER,
-            font=self.font_for_entries
+            font=self.font_for_entries,
+            validate="all",
+            validatecommand=self.email_entry_validate_method
         )
 
         email_ent.pack()
@@ -120,18 +139,23 @@ class RegistrationPage(Tk):
 
         password_ent.pack()
 
+        # confirm password
         user_confirm_password_name_lbl = ttk.Label(users_data_frame, text="Повторите пароль", font=self.font_for_lbl)
         user_confirm_password_name_lbl.pack(pady=(20, 10))
+
         confirm_password_ent = ttk.Entry(
             users_data_frame,
             width=int(50 * self.percentage_width_from_full_hd),
             justify=CENTER,
             font=self.font_for_entries
         )
-        confirm_password_ent.pack()
+        confirm_password_ent.pack(pady=(0, 20 * self.percentage_height_from_full_hd))
 
-        registration_btn = Button(content_frame, text="Зарегистрироваться")
-        registration_btn.pack()
+        # registration button
+        self.registration_btn = Button(content_frame, text="Зарегистрироваться")
+        self.registration_btn.pack(
+            pady=(20 * self.percentage_height_from_full_hd, 20 * self.percentage_height_from_full_hd)
+        )
 
     def back_btn_action(self):
         self.destroy()
@@ -144,12 +168,59 @@ class RegistrationPage(Tk):
     def registrate_new_user(self):
         pass
 
+    def validate_email_entry(self, email):
+        if self.connection is None:
+            self.start_connection_to_db()
+        if self.find_data_in_db(email, email_type=True):
+            self.registration_btn.configure(state=DISABLED)
+            return True
+        self.registration_btn.configure(state=NORMAL)
+        return True
+
+    def validate_login_entry(self, login):
+        if self.connection is None:
+            self.start_connection_to_db()
+        if self.find_data_in_db(login, login_type=True):
+            self.registration_btn.configure(state=DISABLED)
+            return True
+        self.registration_btn.configure(state=NORMAL)
+        return True
+
+    def find_data_in_db(self, data, email_type=False, login_type=False):
+        parameter_in_db = None
+        if email_type:
+            parameter_in_db = "email"
+        else:
+            parameter_in_db = "login"
+
+        self.connection.get_cursor().execute(
+            f'''
+            SELECT *
+            FROM "authorization-data"
+            WHERE
+            {parameter_in_db}='{data}';
+            '''
+        )
+        fetchall_object = self.connection.get_cursor().fetchall()
+        if fetchall_object:
+            if parameter_in_db == "email":
+                print("Адресс электронной почты уже занят!")
+                return True
+            else:
+                print("Логин уже занят!")
+                return True
+
+        return False
+
+    def start_connection_to_db(self):
+        self.connection = Connection()
+        self.connection.make_connection(user=user, password=password, database=database)
+
 
 def main():
     registration_page = RegistrationPage()
     registration_page.mainloop()
 
+
 if __name__ == "__main__":
     main()
-
-
