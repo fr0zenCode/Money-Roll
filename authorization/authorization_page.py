@@ -3,9 +3,9 @@ from tkinter import ttk
 import tkinter.font as tk_font
 from PIL import Image, ImageTk
 
-
 from user.user import User
 import registration_page
+from functions import get_percentage_of_screen_size_from_full_hd_size
 
 from connection import Connection
 from settings import database, user, password
@@ -24,14 +24,22 @@ class AuthorizationPage(Tk):
         # window's properties
         self.title("Авторизация")
         self.state("zoomed")
+
         self.configure(background=self.background_color)
 
         # screen sizes
-        self.percentage_width_from_full_hd = self._get_percentage_of_screen_size_from_full_hd_size()[0] / 100
-        self.percentage_height_from_full_hd = self._get_percentage_of_screen_size_from_full_hd_size()[1] / 100
+        self.percentage_width_from_full_hd = get_percentage_of_screen_size_from_full_hd_size(self)[0] / 100
+        self.percentage_height_from_full_hd = get_percentage_of_screen_size_from_full_hd_size(self)[1] / 100
+
+        self.minsize(int(451 * self.percentage_width_from_full_hd), int(451 * self.percentage_height_from_full_hd))
+
+        # cursors
+        self.cursor_for_btn = "hand2"
+
+        self.entry1_var = StringVar()
+        self.entry2_var = StringVar()
 
         # fonts
-
         font_for_entries = tk_font.Font(
             family="Arial",
             size=int(10 * ((self.percentage_width_from_full_hd + self.percentage_height_from_full_hd) / 2)),
@@ -47,7 +55,11 @@ class AuthorizationPage(Tk):
             size=int(13 * ((self.percentage_width_from_full_hd + self.percentage_height_from_full_hd) / 2))
         )
 
-        font_for_btn = None
+        self.font_for_registration_btn = tk_font.Font(
+            family="Arial",
+            size=int(10 * ((self.percentage_width_from_full_hd + self.percentage_height_from_full_hd) / 2)),
+            underline=True
+        )
 
         entry_style = ttk.Style()
         entry_style.configure(
@@ -59,6 +71,9 @@ class AuthorizationPage(Tk):
         self.submit_error_text = StringVar()
         self.connection = None
         self.player = None
+
+        # validate command
+        self.entries_validate_method = (self.register(self.validate_entries), '%d')
 
         content_frame = Frame(background=self.background_color)
         content_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
@@ -94,14 +109,17 @@ class AuthorizationPage(Tk):
             background=self.background_color
         )
         email_name_lbl.pack(pady=(0, 5 * self.percentage_height_from_full_hd))
-        email_ent = ttk.Entry(
+        self.email_ent = ttk.Entry(
             users_data_frame,
             width=int(50 * self.percentage_width_from_full_hd),
             font=font_for_entries,
             justify=CENTER,
-            background=self.background_color
+            background=self.background_color,
+            validate="all",
+            validatecommand=self.entries_validate_method,
+            textvariable=self.entry1_var
         )
-        email_ent.pack(padx=20 * self.percentage_width_from_full_hd)
+        self.email_ent.pack(padx=20 * self.percentage_width_from_full_hd)
 
         password_name_lbl = ttk.Label(
             users_data_frame,
@@ -112,36 +130,43 @@ class AuthorizationPage(Tk):
         password_name_lbl.pack(
             pady=(10 * self.percentage_height_from_full_hd, 5 * self.percentage_height_from_full_hd)
         )
-        password_ent = ttk.Entry(
+        self.password_ent = ttk.Entry(
             users_data_frame,
             show="•",
             width=int(50 * self.percentage_width_from_full_hd),
             font=font_for_entries,
             justify=CENTER,
-            background=self.background_color
+            background=self.background_color,
+            validate="all",
+            validatecommand=self.entries_validate_method,
+            textvariable=self.entry2_var
         )
-        password_ent.pack(pady=(0, 20 * self.percentage_height_from_full_hd))
+        self.password_ent.pack(pady=(0, 20 * self.percentage_height_from_full_hd))
 
-        submit_btn = Button(
+        self.submit_btn = Button(
             content_frame,
             text="Войти",
             width=20,
             height=2,
-            bd=1,
+            bd=0,
+            cursor=self.cursor_for_btn,
             relief=RIDGE,
-            command=lambda: self.find_user_in_db(email_ent.get(), password_ent.get())
+            font=font_for_lbl,
+            command=lambda: self.find_user_in_db(self.email_ent.get(), self.password_ent.get()),
+            background="#94C1C0",
+            state=DISABLED
         )
-        submit_btn.pack(pady=(30 * self.percentage_height_from_full_hd, 0))
+        self.submit_btn.pack(pady=(30 * self.percentage_height_from_full_hd, 0))
 
         registration_btn = Button(
             content_frame,
             text="Зарегистрироваться",
-            width=20,
-            height=2,
-            bd=1,
+            bd=0,
+            cursor=self.cursor_for_btn,
             relief=RIDGE,
-            font=font_for_lbl,
-            command=lambda: self.switch_to_registration_page()
+            font=self.font_for_registration_btn,
+            command=lambda: self.switch_to_registration_page(),
+            background=self.background_color
         )
         registration_btn.pack(
             pady=(20 * self.percentage_height_from_full_hd, 30 * self.percentage_height_from_full_hd)
@@ -149,6 +174,14 @@ class AuthorizationPage(Tk):
 
         submit_btn_error_text_lbl = ttk.Label(textvariable=self.submit_error_text)
         submit_btn_error_text_lbl.pack()
+
+    def validate_entries(self, d):
+        if d == "1" or d == "0" or d == "-1":
+            if self.entry1_var.get() and self.entry2_var.get():
+                self.submit_btn.configure(state=NORMAL)
+            else:
+                self.submit_btn.configure(state=DISABLED)
+        return True
 
     def start_connection_to_db(self):
         self.connection = Connection()
@@ -217,19 +250,6 @@ class AuthorizationPage(Tk):
         self.destroy()
         main_window_var = MainWindow(self.player)
         main_window_var.mainloop()
-
-    def _get_percentage_of_screen_size_from_full_hd_size(self):
-
-        normal_screen_width = 1920
-        normal_screen_height = 1080
-
-        device_screen_width = self.winfo_screenwidth()
-        device_screen_height = self.winfo_screenheight()
-
-        percentage_width = (device_screen_width / normal_screen_width) * 100
-        percentage_height = (device_screen_height / normal_screen_height) * 100
-
-        return percentage_width, percentage_height
 
 
 if __name__ == "__main__":
