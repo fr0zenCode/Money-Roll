@@ -220,7 +220,7 @@ class AuthorizationPage(Tk):
                   f'Ваше имя: {self.player.first_name} \n'
                   f'Ваша фамилия: {self.player.last_name} \n'
                   f'Ваш пароль: {self.player.get_password()} \n'
-                  f'Ваш баланс: {self.player._balance} рублей \n'
+                  f'Ваш баланс: {self.player.get_balance()} рублей \n'
                   f'Ваш шанс на большой выигрыш {self.player._chance_for_big_win}% \n')
         else:
             print(f"Пользователь со следующими данными не найден: \n"
