@@ -1,3 +1,4 @@
+import _tkinter
 from threading import Thread, enumerate
 from time import sleep
 from random import choice
@@ -8,7 +9,7 @@ from tkinter.messagebox import showerror
 from game import Game
 from user_package.user import User
 import user_package.top_up_the_balance_page as tup_up_the_balance_page
-
+import authorization.functions as functions
 
 class MainWindow(Tk):
 
@@ -16,12 +17,20 @@ class MainWindow(Tk):
         super().__init__()
 
         self.title("MoneyRoll")
-        self.geometry("600x400")
+        self.state("zoomed")
+
+        # screen sizes
+        self.percentage_width_from_full_hd = functions.get_percentage_of_screen_size_from_full_hd_size(self)[0] / 100
+        self.percentage_height_from_full_hd = functions.get_percentage_of_screen_size_from_full_hd_size(self)[1] / 100
+
+        self.minsize(int(451 * self.percentage_width_from_full_hd), int(451 * self.percentage_height_from_full_hd))
 
         self.images_for_roll = []
 
         self.default_image = StringVar()
+
         self.default_image.set("../img/blue_item_5_rub.png")
+
         self.current_win = 0
         self.current_win_var = StringVar()
         self.current_win_var.set("")
@@ -36,18 +45,52 @@ class MainWindow(Tk):
         self.users_curr_balance = StringVar()
         self.users_curr_balance.set(f"Баланс: {self.player.get_balance()} рублей")
 
-        # player's info section
-        player_info_frame = Frame(self, borderwidth=1, relief=SOLID)
-        player_info_frame.pack(anchor=NW)
-        balance_lbl = ttk.Label(player_info_frame, textvariable=self.users_curr_balance)
-        balance_lbl.pack(pady=(20, 10), padx=20)
+        # account section
+        ###############################################################################################################
+        account_button_frame = Frame(
+            self,
+            width=int(50 * self.percentage_height_from_full_hd),
+            height=int(50 * self.percentage_height_from_full_hd)
+        )
+        account_button_frame.place(relx=0, rely=0, anchor=NW)
+
+        account_btn = Button(account_button_frame, text="ACC")
+        account_btn.place(relx=0.5, rely=0.5, anchor=CENTER)
+        ###############################################################################################################
+
+        # balance section
+        ###############################################################################################################
+        player_info_frame = Frame(
+            self,
+            borderwidth=1,
+            relief=SOLID,
+            width=int(150 * self.percentage_width_from_full_hd),
+            height=int(50 * self.percentage_height_from_full_hd)
+        )
+        player_info_frame.place(relx=0.03, rely=0, anchor=NW)
+
         increase_balance_btn = Button(player_info_frame, text="Пополнить", command=self.top_up_the_balance_btn_action)
-        increase_balance_btn.pack(pady=(0, 20))
+        increase_balance_btn.place(relx=0.5, rely=0.25, anchor=CENTER)
+
+        balance_lbl_frame = Frame(
+            player_info_frame,
+            width=int(120 * self.percentage_width_from_full_hd),
+            height=int(20 * self.percentage_height_from_full_hd)
+        )
+        balance_lbl_frame.place(relx=0.5, rely=0.75, anchor=CENTER)
+
+        balance_lbl = ttk.Label(balance_lbl_frame, textvariable=self.users_curr_balance)
+        balance_lbl.place(relx=0.5, rely=0.5, anchor=CENTER)
+
+        ###############################################################################################################
 
         # pictures
         self.canvas = Canvas(self, width=300, height=300)
         self.canvas.pack()
-        self.img = PhotoImage(file=self.default_image.get())
+        try:
+            self.img = PhotoImage(file=self.default_image.get())
+        except _tkinter.TclError:
+            self.img = PhotoImage(file="img/purple_item_45_rub.png")
         self.canvas.create_image(20, 20, anchor=NW, image=self.img)
 
         # win text
@@ -83,7 +126,10 @@ class MainWindow(Tk):
         image_files = self.images_for_roll
 
         for image in image_files:
-            self.img = PhotoImage(file=f"../{image}.png")
+            try:
+                self.img = PhotoImage(file=f"../{image}.png")
+            except _tkinter.TclError:
+                self.img = PhotoImage(file=f"{image}.png")
             self.canvas.create_image(20, 20, anchor=NW, image=self.img)
             sleep(0.1)
 
