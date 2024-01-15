@@ -178,7 +178,7 @@ class RegistrationPage(Tk):
 
     def registrate_new_user(self):
 
-        # user data
+        # user_package data
         login = self.login_ent.get()
         first_name = self.first_name_ent.get()
         last_name = self.last_name_ent.get()
