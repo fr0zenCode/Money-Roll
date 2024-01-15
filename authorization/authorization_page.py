@@ -3,7 +3,7 @@ from tkinter import ttk
 import tkinter.font as tk_font
 from PIL import Image, ImageTk
 
-from user.user import User
+from user_package.user import User
 import registration_page
 from functions import get_percentage_of_screen_size_from_full_hd_size
 
