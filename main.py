@@ -4,7 +4,10 @@ from random import choice
 from tkinter import *
 from tkinter import ttk
 from tkinter.messagebox import showerror
+
 from game import Game
+from user_package.user import User
+import user_package.top_up_the_balance_page as tup_up_the_balance_page
 
 
 class MainWindow(Tk):
@@ -17,15 +20,15 @@ class MainWindow(Tk):
 
         self.images_for_roll = []
 
-
         self.default_image = StringVar()
         self.default_image.set("../img/blue_item_5_rub.png")
         self.current_win = 0
         self.current_win_var = StringVar()
         self.current_win_var.set("")
 
+        # current user_package (player)
         self.player = player
-        self.play_btn = None
+
         self.canvas = None
         self.img = None
         self.this_game = Game(self.player)
@@ -38,7 +41,7 @@ class MainWindow(Tk):
         player_info_frame.pack(anchor=NW)
         balance_lbl = ttk.Label(player_info_frame, textvariable=self.users_curr_balance)
         balance_lbl.pack(pady=(20, 10), padx=20)
-        increase_balance_btn = Button(player_info_frame, text="Пополнить")
+        increase_balance_btn = Button(player_info_frame, text="Пополнить", command=self.top_up_the_balance_btn_action)
         increase_balance_btn.pack(pady=(0, 20))
 
         # pictures
@@ -108,9 +111,25 @@ class MainWindow(Tk):
         result_list = [choice(all_pictures) for i in range(9)]
         return result_list
 
+    def top_up_the_balance_btn_action(self):
+        player = self.player
+        self.destroy()
+        top_up_the_balance_page = tup_up_the_balance_page.TopUpTheBalancePage(player)
+        top_up_the_balance_page.mainloop()
+
 
 def main():
-    main_window = MainWindow()
+    player = User(
+        'Login',
+        "user_id",
+        "first_name",
+        "last_name",
+        "email",
+        "password",
+        1000,
+        0
+    )
+    main_window = MainWindow(player)
     main_window.mainloop()
 
 
