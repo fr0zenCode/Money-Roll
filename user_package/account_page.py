@@ -1,11 +1,8 @@
 from tkinter import *
-from tkinter import ttk
-import tkinter.font as TkFont
-
-from PIL import Image, ImageTk
 
 import authorization.functions as functions
 import user_package.user as user
+from account_page_main_frame import AccountPageMainFrame
 
 
 class AccountPage(Tk):
@@ -18,137 +15,8 @@ class AccountPage(Tk):
         self.title("Аккаунт")
         self.state("zoomed")
 
-        # screen sizes
-        self.percentage_width_from_full_hd = functions.get_percentage_of_screen_size_from_full_hd_size(self)[0] / 100
-        self.percentage_height_from_full_hd = functions.get_percentage_of_screen_size_from_full_hd_size(self)[1] / 100
-
-        self.minsize(int(451 * self.percentage_width_from_full_hd), int(451 * self.percentage_height_from_full_hd))
-
-        # fonts
-
-
-        self.font_for_lbl = self.create_font_for_lbl(
-            10 * (self.percentage_width_from_full_hd + self.percentage_height_from_full_hd) / 2)
-
-        self.font_for_ent = self.font_for_lbl
-        self.font_for_combobox = self.font_for_lbl
-
-
-
-        # main frame
-        ###############################################################################################################
-        content_frame = Frame(
-            background="green",
-            # width=int(800 * self.percentage_width_from_full_hd),
-            # height=int(500 * self.percentage_height_from_full_hd)
-        )
-        content_frame.place(relx=0.5, rely=0.5, anchor=CENTER, relwidth=0.5, relheight=0.5)
-        content_frame.pack_propagate(False)
-        ###############################################################################################################
-
-        ###############################################################################################################
-        ###############################################################################################################
-
-        upper_frame = Frame(content_frame, background="yellow")
-        upper_frame.pack(expand=True, fill=BOTH)
-
-
-
-
-
-        avatar_frame = Frame(upper_frame, background="red")
-        avatar_frame.place(relx=0, rely=0, relwidth=0.33, relheight=1)
-
-
-
-
-        photo_frame = Frame(avatar_frame, background="blue")
-        photo_frame.place(relwidth=1, relheight=0.75)
-
-
-        self.photo_variant_string = StringVar()
-        self.photo_variant_string.set("../img/log_in_logo.png")
-
-        self.img = Image.open(self.photo_variant_string.get())
-        self.resized_image = self.img.resize((
-            int(200 * self.percentage_width_from_full_hd),
-            int(300 * self.percentage_height_from_full_hd))
-        )
-        self.new_image = ImageTk.PhotoImage(self.resized_image)
-
-        self.label_avatar = ttk.Label(photo_frame, image=self.new_image)
-        self.label_avatar.place(relx=0.5, rely=0.5, anchor=CENTER)
-
-
-
-
-        photo_selector_frame = Frame(avatar_frame, background="pink")
-        photo_selector_frame.place(relx=0, rely=1, relwidth=1, relheight=0.25, anchor=SW)
-
-        photo_variants = ("<Выберите аватар>", "Лудоман", "Озорник", "Плохой парень")
-        combobox_variable = StringVar()
-        combobox_variable.set(photo_variants[0])
-
-        photo_selector_combobox = ttk.Combobox(
-            photo_selector_frame,
-            textvariable=combobox_variable,
-            font=self.font_for_combobox
-        )
-        photo_selector_combobox["values"] = photo_variants
-        photo_selector_combobox.pack(pady=(20 * self.percentage_width_from_full_hd, 60 * self.percentage_height_from_full_hd))
-
-
-
-
-
-
-
-        # user's data
-        users_data_frame = Frame(upper_frame, background="green")
-        users_data_frame.place(relx=0.33, rely=0, relwidth=0.67, relheight=1, anchor=NW)
-
-
-        self.first_name_ent = self.create_entry(users_data_frame, "Имя:", "grey")
-        self.last_name_end = self.create_entry(users_data_frame, "Фамилия:", "grey")
-        self.current_password_ent = self.create_entry(users_data_frame, "Старый пароль:", "grey")
-        self.new_password_end = self.create_entry(users_data_frame, "Новый пароль:", "grey")
-        self.confirm_new_password_ent = self.create_entry(users_data_frame, "Подтверждение пароля:",
-                                                          "grey")
-
-        # bottom
-        ###############################################################################################################
-        bottom_frame = Frame(content_frame, background="blue")
-        bottom_frame.pack(fill=X)
-
-        buttons_frame = Frame(bottom_frame, background="red")
-        buttons_frame.pack(pady=10 * self.percentage_height_from_full_hd)
-
-        cancel_btn = Button(buttons_frame, text="Отмена")
-        submit_btn = Button(buttons_frame, text="Принять")
-        cancel_btn.pack(side=LEFT, pady=10 * self.percentage_height_from_full_hd)
-        submit_btn.pack(side=LEFT, padx=(30 * self.percentage_width_from_full_hd, 0))
-
-        ###############################################################################################################
-
-        ###############################################################################################################
-        ###############################################################################################################
-
-
-
-
-    @staticmethod
-    def create_font_for_lbl(font_size):
-        font = TkFont.Font(family="Arial", size=int(font_size))
-        return font
-
-    def create_entry(self, parent_frame, text, bg_color):
-        frame = Frame(parent_frame, background=bg_color)
-        frame.pack(expand=True, fill=BOTH)
-        frame_lbl = ttk.Label(frame, text=text, font=self.font_for_lbl, background=bg_color)
-        frame_ent = ttk.Entry(frame, font=self.font_for_ent, background=bg_color)
-        frame_lbl.place(relx=0.1, rely=0.5, anchor=W, relwidth=0.5, relheight=0.3)
-        frame_ent.place(relx=0.6, rely=0.5, anchor=W, relwidth=0.3, relheight=0.3)
-        return frame_ent
+        main_frame = AccountPageMainFrame(self.player)
+        main_frame.place(relx=0.5, rely=0.5, anchor=CENTER, relwidth=1, relheight=1)
 
 
 def main():
