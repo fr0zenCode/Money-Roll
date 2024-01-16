@@ -26,6 +26,7 @@ class AccountPage(Tk):
 
         # fonts
 
+
         self.font_for_lbl = self.create_font_for_lbl(
             10 * (self.percentage_width_from_full_hd + self.percentage_height_from_full_hd) / 2)
 
@@ -55,15 +56,15 @@ class AccountPage(Tk):
 
 
 
-        avatar_frame = Frame(upper_frame, background="red", width=int(250 * self.percentage_width_from_full_hd))
-        avatar_frame.pack(side=LEFT, fill=BOTH)
-        avatar_frame.pack_propagate(False)
+        avatar_frame = Frame(upper_frame, background="red")
+        avatar_frame.place(relx=0, rely=0, relwidth=0.33, relheight=1)
+
 
 
 
         photo_frame = Frame(avatar_frame, background="blue")
-        photo_frame.pack(expand=True, fill=BOTH)
-        photo_frame.pack_propagate(False)
+        photo_frame.place(relwidth=1, relheight=0.75)
+
 
         self.photo_variant_string = StringVar()
         self.photo_variant_string.set("../img/log_in_logo.png")
@@ -82,7 +83,7 @@ class AccountPage(Tk):
 
 
         photo_selector_frame = Frame(avatar_frame, background="pink")
-        photo_selector_frame.pack(fill=BOTH)
+        photo_selector_frame.place(relx=0, rely=1, relwidth=1, relheight=0.25, anchor=SW)
 
         photo_variants = ("<Выберите аватар>", "Лудоман", "Озорник", "Плохой парень")
         combobox_variable = StringVar()
@@ -104,8 +105,8 @@ class AccountPage(Tk):
 
         # user's data
         users_data_frame = Frame(upper_frame, background="green")
-        users_data_frame.pack(side=LEFT, expand=True, fill=BOTH)
-        users_data_frame.pack_propagate(False)
+        users_data_frame.place(relx=0.33, rely=0, relwidth=0.67, relheight=1, anchor=NW)
+
 
         self.first_name_ent = self.create_entry(users_data_frame, "Имя:", "grey")
         self.last_name_end = self.create_entry(users_data_frame, "Фамилия:", "grey")
@@ -145,8 +146,8 @@ class AccountPage(Tk):
         frame.pack(expand=True, fill=BOTH)
         frame_lbl = ttk.Label(frame, text=text, font=self.font_for_lbl, background=bg_color)
         frame_ent = ttk.Entry(frame, font=self.font_for_ent, background=bg_color)
-        frame_lbl.pack(side=LEFT, padx=(10 * self.percentage_width_from_full_hd, 0))
-        frame_ent.pack(side=RIGHT, padx=(0, 10 * self.percentage_width_from_full_hd))
+        frame_lbl.place(relx=0.1, rely=0.5, anchor=W, relwidth=0.5, relheight=0.3)
+        frame_ent.place(relx=0.6, rely=0.5, anchor=W, relwidth=0.3, relheight=0.3)
         return frame_ent
 
 
