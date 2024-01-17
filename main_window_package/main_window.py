@@ -6,10 +6,14 @@ from tkinter import *
 from tkinter import ttk
 from tkinter.messagebox import showerror
 
-from game import Game
+import main_window_package.game as game
 from user_package.user import User
+
+import user_package.account_page as account_page
+
 import user_package.top_up_the_balance_page as tup_up_the_balance_page
 import authorization.functions as functions
+
 
 class MainWindow(Tk):
 
@@ -40,7 +44,7 @@ class MainWindow(Tk):
 
         self.canvas = None
         self.img = None
-        self.this_game = Game(self.player)
+        self.this_game = game.Game(self.player)
 
         self.users_curr_balance = StringVar()
         self.users_curr_balance.set(f"Баланс: {self.player.get_balance()} рублей")
@@ -54,7 +58,7 @@ class MainWindow(Tk):
         )
         account_button_frame.place(relx=0, rely=0, anchor=NW)
 
-        account_btn = Button(account_button_frame, text="ACC")
+        account_btn = Button(account_button_frame, text="ACC", command=self.account_btn_action)
         account_btn.place(relx=0.5, rely=0.5, anchor=CENTER)
         ###############################################################################################################
 
@@ -90,7 +94,7 @@ class MainWindow(Tk):
         try:
             self.img = PhotoImage(file=self.default_image.get())
         except _tkinter.TclError:
-            self.img = PhotoImage(file="img/purple_item_45_rub.png")
+            self.img = PhotoImage(file="../img/purple_item_45_rub.png")
         self.canvas.create_image(20, 20, anchor=NW, image=self.img)
 
         # win text
@@ -117,9 +121,12 @@ class MainWindow(Tk):
         print(self.player.first_name)
         print(self.player.get_balance())
 
+        self.mainloop()
+
     def _change_pictures(self):
         thread = Thread(target=self.change_mechanic, daemon=True)
         thread.start()
+
 
     def change_mechanic(self):
 
@@ -137,6 +144,13 @@ class MainWindow(Tk):
         self.current_win_var.set(f"Вы выиграли {self.current_win} рублей!")
         self.player.increase_balance(self.current_win)
         self.users_curr_balance.set(f"Баланс: {self.player.get_balance()} рублей")
+
+        self.mainloop()
+
+    def account_btn_action(self):
+        player = self.player
+        self.destroy()
+        account_page.AccountPage(player)
 
     @staticmethod
     def print_active_threads():
