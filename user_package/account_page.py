@@ -1,11 +1,13 @@
 from tkinter import *
+import customtkinter as ctk
+
 
 import authorization.functions as functions
 import user_package.user as user
-from account_page_main_frame import AccountPageMainFrame
+import user_package.account_page_main_frame as account_page_main_frame
 
 
-class AccountPage(Tk):
+class AccountPage(ctk.CTk):
 
     def __init__(self, player):
         super().__init__()
@@ -14,8 +16,9 @@ class AccountPage(Tk):
 
         self.title("Аккаунт")
         self.state("zoomed")
+        self.minsize(600, 400)
 
-        main_frame = AccountPageMainFrame(self.player)
+        main_frame = account_page_main_frame.AccountPageMainFrame(self, self.player)
         main_frame.place(relx=0.5, rely=0.5, anchor=CENTER, relwidth=1, relheight=1)
 
 
