@@ -2,12 +2,10 @@ from tkinter import *
 from tkinter import ttk
 import tkinter.font as tk_font
 
-import authorization_page
 from functions import get_percentage_of_screen_size_from_full_hd_size
 
 from connection import Connection
 from settings import database, user, password
-from main import MainWindow
 import authorization_page
 
 
@@ -70,7 +68,7 @@ class RegistrationPage(Tk):
             text="Назад",
             command=self.back_btn_action
         )
-        back_btn.pack(anchor=NW, pady=10 * self.percentage_height_from_full_hd)
+        back_btn.pack(anchor=NW, pady=int(10 * self.percentage_height_from_full_hd))
 
         users_data_frame = Frame(content_frame, borderwidth=1, relief=SOLID, background=self.background_color)
         users_data_frame.pack()
@@ -113,7 +111,7 @@ class RegistrationPage(Tk):
             font=self.font_for_entries,
         )
 
-        self.last_name_ent.pack(padx=(20 * self.percentage_width_from_full_hd))
+        self.last_name_ent.pack(padx=int(20 * self.percentage_width_from_full_hd))
 
         user_email_name_lbl = Label(users_data_frame, text="Ваш адрес электронной почты", font=self.font_for_lbl)
         user_email_name_lbl.pack(pady=(20, 10), padx=40)

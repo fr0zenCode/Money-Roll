@@ -1,6 +1,8 @@
 from tkinter import *
-from tkinter import ttk
 import tkinter.font as tk_font
+
+import ttkbootstrap as ttk
+
 from PIL import Image, ImageTk
 
 from user_package.user import User
@@ -9,7 +11,7 @@ from functions import get_percentage_of_screen_size_from_full_hd_size
 
 from connection import Connection
 from settings import database, user, password
-from main import MainWindow
+from main_window_package.main_window import MainWindow
 
 
 class AuthorizationPage(Tk):
@@ -88,8 +90,8 @@ class AuthorizationPage(Tk):
             background=self.background_color
         )
         users_data_frame_name.pack(
-            pady=(20 * self.percentage_height_from_full_hd, 20 * self.percentage_width_from_full_hd),
-            padx=20 * self.percentage_width_from_full_hd
+            pady=(int(20 * self.percentage_height_from_full_hd), int(20 * self.percentage_width_from_full_hd)),
+            padx=int(20 * self.percentage_width_from_full_hd)
         )
 
         # small logo
@@ -118,7 +120,7 @@ class AuthorizationPage(Tk):
             validate="key",
             validatecommand=self.entries_validate_method
         )
-        self.email_ent.pack(padx=20 * self.percentage_width_from_full_hd)
+        self.email_ent.pack(padx=int(20 * self.percentage_width_from_full_hd))
 
         password_name_lbl = ttk.Label(
             users_data_frame,
@@ -156,15 +158,9 @@ class AuthorizationPage(Tk):
         )
         self.submit_btn.pack(pady=(30 * self.percentage_height_from_full_hd, 0))
 
-        registration_btn = Button(
-            content_frame,
-            text="Зарегистрироваться",
-            bd=0,
+        registration_btn = ttk.Button(content_frame, text="Зарегистрироваться", bootstyle="success-link",
             cursor=self.cursor_for_btn,
-            relief=RIDGE,
-            font=self.font_for_registration_btn,
             command=lambda: self.switch_to_registration_page(),
-            background=self.background_color
         )
         registration_btn.pack(
             pady=(20 * self.percentage_height_from_full_hd, 30 * self.percentage_height_from_full_hd)
