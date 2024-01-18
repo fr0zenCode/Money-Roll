@@ -1,20 +1,18 @@
-from tkinter import *
-import tkinter.font as tk_font
-
-import ttkbootstrap as ttk
+import tkinter as tk
+import _tkinter
+import customtkinter as ctk
 
 from PIL import Image, ImageTk
 
-from user_package.user import User
+import settings
+import connection
+
 import registration_page
-from functions import get_percentage_of_screen_size_from_full_hd_size
-
-from connection import Connection
-from settings import database, user, password
-from main_window_package.main_window import MainWindow
+import user_package.user as user
+import main_window_package.main_window as main_window
 
 
-class AuthorizationPage(Tk):
+class AuthorizationPage(tk.Tk):
 
     def __init__(self):
         super().__init__()
@@ -29,157 +27,137 @@ class AuthorizationPage(Tk):
 
         self.configure(background=self.background_color)
 
-        # screen sizes
-        self.percentage_width_from_full_hd = get_percentage_of_screen_size_from_full_hd_size(self)[0] / 100
-        self.percentage_height_from_full_hd = get_percentage_of_screen_size_from_full_hd_size(self)[1] / 100
+        # image
+        self.small_logo = tk.StringVar(value="img/log_in_logo.png")
 
-        self.minsize(int(451 * self.percentage_width_from_full_hd), int(451 * self.percentage_height_from_full_hd))
+        self.minsize(1500, 1000)
 
         # cursors
         self.cursor_for_btn = "hand2"
 
-        self.entry1_var = StringVar()
-        self.entry2_var = StringVar()
-
-        # fonts
-        font_for_entries = tk_font.Font(
-            family="Arial",
-            size=int(10 * ((self.percentage_width_from_full_hd + self.percentage_height_from_full_hd) / 2)),
-        )
-
-        font_for_lbl = tk_font.Font(
-            family="Arial",
-            size=int(11 * ((self.percentage_width_from_full_hd + self.percentage_height_from_full_hd) / 2))
-        )
-
-        font_for_h1_lbl = tk_font.Font(
-            family="Arial",
-            size=int(13 * ((self.percentage_width_from_full_hd + self.percentage_height_from_full_hd) / 2))
-        )
-
-        self.font_for_registration_btn = tk_font.Font(
-            family="Arial",
-            size=int(10 * ((self.percentage_width_from_full_hd + self.percentage_height_from_full_hd) / 2)),
-            underline=True
-        )
-
-        entry_style = ttk.Style()
-        entry_style.configure(
-            "TEntry",
-            foreground="#3A3737",
-        )
+        self.entry1_var = tk.StringVar()
+        self.entry2_var = tk.StringVar()
 
         # dynamic variables
-        self.submit_error_text = StringVar()
+        self.submit_error_text = tk.StringVar()
         self.connection = None
         self.player = None
 
         # validate command
         self.entries_validate_method = (self.register(self.validate_entries), '%P')
 
-        content_frame = Frame(background=self.background_color)
-        content_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
+        # main frame
+        ###############################################################################################################
+        content_frame = ctk.CTkFrame(self, fg_color="yellow")
+        content_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER, relwidth=0.8, relheight=0.8)
+        ###############################################################################################################
 
-        users_data_frame = Frame(content_frame, borderwidth=1, relief=SOLID, background=self.background_color)
-        users_data_frame.pack(pady=(20 * self.percentage_height_from_full_hd, 0))
+        # users data frame
+        ###############################################################################################################
+        upper_frame = ctk.CTkFrame(content_frame, fg_color="blue")
+        upper_frame.place(relx=0, rely=0, anchor="nw", relwidth=1, relheight=0.5)
 
-        users_data_frame_name = ttk.Label(
-            users_data_frame,
-            text="Авторизация пользователя",
-            font=font_for_h1_lbl,
-            background=self.background_color
-        )
-        users_data_frame_name.pack(
-            pady=(int(20 * self.percentage_height_from_full_hd), int(20 * self.percentage_width_from_full_hd)),
-            padx=int(20 * self.percentage_width_from_full_hd)
-        )
+        page_name = ctk.CTkLabel(upper_frame, text="Авторизация пользователя", font=("Arial", 20))
+        page_name.place(relx=0.5, rely=0, anchor="n", relwidth=0.9, relheight=0.1)
 
         # small logo
-        self.img = Image.open("../img/log_in_logo.png")
-        self.resized_image = self.img.resize((
-            int(70 * self.percentage_width_from_full_hd),
-            int(70 * self.percentage_height_from_full_hd))
-        )
-        self.new_image = ImageTk.PhotoImage(self.resized_image)
-        label = ttk.Label(users_data_frame, image=self.new_image, background=self.background_color)
-        label.pack(pady=(0, 20 * self.percentage_height_from_full_hd))
+        ###############################################################################################################
+        self.canvas = tk.Canvas(master=upper_frame, background="red", bd=0, highlightthickness=0, relief="ridge")
+        self.canvas.place(relx=0.5, rely=0.2, anchor="n", relwidth=0.06, relheight=0.2)
+        self.canvas.bind("<Configure>", self.stretch_small_logo)
 
-        email_name_lbl = ttk.Label(
-            users_data_frame,
-            text="Введите email:",
-            font=font_for_lbl,
-            background=self.background_color
-        )
-        email_name_lbl.pack(pady=(0, 5 * self.percentage_height_from_full_hd))
-        self.email_ent = ttk.Entry(
-            users_data_frame,
-            width=int(50 * self.percentage_width_from_full_hd),
-            font=font_for_entries,
-            justify=CENTER,
-            background=self.background_color,
+        try:
+            self.image_original = Image.open(self.small_logo.get())
+        except _tkinter.TclError:
+            self.image_original = Image.open(f"../{self.small_logo.get()}")
+        except FileNotFoundError:
+            self.image_original = Image.open(f"../{self.small_logo.get()}")
+
+        self.resized_image = self.image_original.resize((self.winfo_width(), self.winfo_height()))
+        self.resized_tk = ImageTk.PhotoImage(self.resized_image)
+
+        self.canvas.create_image(0, 0, anchor="nw", image=self.resized_tk)
+        ###############################################################################################################
+
+        # email entry
+        ###############################################################################################################
+        email_name_lbl = ctk.CTkLabel(upper_frame, text="Введите email:", font=("Arial", 12), fg_color="pink")
+        email_name_lbl.place(relx=0.5, rely=0.5, anchor="n", relwidth=0.9, relheight=0.05)
+
+        self.email_ent = ctk.CTkEntry(
+            upper_frame,
+            justify="center",
+            fg_color="red",
             validate="key",
             validatecommand=self.entries_validate_method
         )
-        self.email_ent.pack(padx=int(20 * self.percentage_width_from_full_hd))
 
-        password_name_lbl = ttk.Label(
-            users_data_frame,
+        self.email_ent.place(relx=0.5, rely=0.55, anchor="n", relwidth=0.5, relheight=0.1)
+        ###############################################################################################################
+
+        # password entry
+        ###############################################################################################################
+        password_name_lbl = ctk.CTkLabel(
+            upper_frame,
             text="Введите пароль:",
-            font=font_for_lbl,
-            background=self.background_color
+            fg_color="pink"
         )
-        password_name_lbl.pack(
-            pady=(10 * self.percentage_height_from_full_hd, 5 * self.percentage_height_from_full_hd)
-        )
-        self.password_ent = ttk.Entry(
-            users_data_frame,
+        password_name_lbl.place(relx=0.5, rely=0.7, anchor="n", relwidth=0.9, relheight=0.05)
+
+        self.password_ent = ctk.CTkEntry(
+            upper_frame,
             show="•",
-            width=int(50 * self.percentage_width_from_full_hd),
-            font=font_for_entries,
-            justify=CENTER,
-            background=self.background_color,
+            justify="center",
+            fg_color="red",
             validate="key",
             validatecommand=self.entries_validate_method
         )
-        self.password_ent.pack(pady=(0, 20 * self.percentage_height_from_full_hd))
+        self.password_ent.place(relx=0.5, rely=0.75, anchor="n", relwidth=0.5, relheight=0.1)
+        ###############################################################################################################
 
-        self.submit_btn = Button(
-            content_frame,
+        # down frame
+        ###############################################################################################################
+        down_frame = ctk.CTkFrame(content_frame, fg_color="black")
+        down_frame.place(relx=0, rely=0.5, anchor="nw", relwidth=1, relheight=0.5)
+        ###############################################################################################################
+
+        # buttons
+        ###############################################################################################################
+        self.submit_btn = ctk.CTkButton(
+            down_frame,
             text="Войти",
-            width=20,
-            height=2,
-            bd=0,
-            cursor=self.cursor_for_btn,
-            relief=RIDGE,
-            font=font_for_lbl,
             command=lambda: self.find_user_in_db(self.email_ent.get(), self.password_ent.get()),
-            background="#94C1C0",
-            state=DISABLED
+            state=tk.DISABLED
         )
-        self.submit_btn.pack(pady=(30 * self.percentage_height_from_full_hd, 0))
+        self.submit_btn.place(relx=0.5, rely=0, anchor="n", relwidth=0.14, relheight=0.14)
 
-        registration_btn = ttk.Button(content_frame, text="Зарегистрироваться", bootstyle="success-link",
-            cursor=self.cursor_for_btn,
-            command=lambda: self.switch_to_registration_page(),
-        )
-        registration_btn.pack(
-            pady=(20 * self.percentage_height_from_full_hd, 30 * self.percentage_height_from_full_hd)
-        )
+        submit_error_lbl = ctk.CTkLabel(down_frame, textvariable=self.submit_error_text)
+        submit_error_lbl.place(relx=0.5, rely=0.14, anchor="n", relwidth=0.9, relheight=0.05)
 
-        submit_btn_error_text_lbl = ttk.Label(textvariable=self.submit_error_text)
-        submit_btn_error_text_lbl.pack()
+        registration_btn = ctk.CTkButton(down_frame,
+                                         text="Зарегистрироваться",
+                                         command=lambda: self.switch_to_registration_page())
+        registration_btn.place(relx=0.5, rely=0.20, anchor="n", relwidth=0.14, relheight=0.14)
+        ###############################################################################################################
+
+    def stretch_small_logo(self, event):
+        width = event.width
+        height = event.height
+        self.resized_image = self.image_original.resize((width, height))
+        self.resized_tk = ImageTk.PhotoImage(self.resized_image)
+        self.canvas.create_image(0, 0, image=self.resized_tk, anchor="nw")
 
     def validate_entries(self, text):
         if (len(text) > 0 and len(self.email_ent.get()) > 0) or (len(text) > 0 and len(self.password_ent.get()) > 0):
-            self.submit_btn.configure(state=NORMAL)
+            self.submit_btn.configure(state=tk.NORMAL)
         elif not self.email_ent.get() or not self.password_ent.get() or len(text) == 0:
-            self.submit_btn.configure(state=DISABLED)
+            self.submit_btn.configure(state=tk.DISABLED)
         else:
-            self.submit_btn.configure(state=NORMAL)
+            self.submit_btn.configure(state=tk.NORMAL)
         return True
 
     def start_connection_to_db(self):
-        self.connection = Connection()
+        self.connection = connection.Connection()
         self.connection.make_connection(user=user, password=password, database=database)
 
     def find_user_in_db(self, user_email, user_password):
@@ -240,10 +218,10 @@ class AuthorizationPage(Tk):
             balance=0,
             chance_for_big_win=0
     ):
-        self.player = User(login, user_id, first_name, last_name, email, user_password, balance, chance_for_big_win)
+        self.player = user.User(login, user_id, first_name, last_name, email, user_password, balance, chance_for_big_win)
         self.player.auth = True
         self.destroy()
-        main_window_var = MainWindow(self.player)
+        main_window_var = main_window.MainWindow(self.player)
         main_window_var.mainloop()
 
 
