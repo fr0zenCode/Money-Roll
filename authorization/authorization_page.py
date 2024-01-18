@@ -4,8 +4,8 @@ import customtkinter as ctk
 
 from PIL import Image, ImageTk
 
-import settings
 import connection
+from settings import user as db_user, password as db_password, database as db_name
 
 import registration_page
 import user_package.user as user
@@ -17,20 +17,19 @@ class AuthorizationPage(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        # colors
-        self.background_color = "#EDE9E6"
-        self.buttons_color = ""
-
         # window's properties
         self.title("Авторизация")
         self.state("zoomed")
 
-        self.configure(background=self.background_color)
-
         # image
         self.small_logo = tk.StringVar(value="img/log_in_logo.png")
 
-        self.minsize(1500, 1000)
+        self.screen_width = self.winfo_screenwidth()
+        self.screen_height = self.winfo_screenheight()
+
+        print(self.screen_width / 2, self.screen_height / 2)
+
+        self.minsize(self.screen_width // 2, self.screen_height // 2)
 
         # cursors
         self.cursor_for_btn = "hand2"
@@ -48,13 +47,13 @@ class AuthorizationPage(tk.Tk):
 
         # main frame
         ###############################################################################################################
-        content_frame = ctk.CTkFrame(self, fg_color="yellow")
+        content_frame = ctk.CTkFrame(self)
         content_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER, relwidth=0.8, relheight=0.8)
         ###############################################################################################################
 
         # users data frame
         ###############################################################################################################
-        upper_frame = ctk.CTkFrame(content_frame, fg_color="blue")
+        upper_frame = ctk.CTkFrame(content_frame)
         upper_frame.place(relx=0, rely=0, anchor="nw", relwidth=1, relheight=0.5)
 
         page_name = ctk.CTkLabel(upper_frame, text="Авторизация пользователя", font=("Arial", 20))
@@ -62,7 +61,7 @@ class AuthorizationPage(tk.Tk):
 
         # small logo
         ###############################################################################################################
-        self.canvas = tk.Canvas(master=upper_frame, background="red", bd=0, highlightthickness=0, relief="ridge")
+        self.canvas = tk.Canvas(master=upper_frame, bd=0, highlightthickness=0, relief="ridge")
         self.canvas.place(relx=0.5, rely=0.2, anchor="n", relwidth=0.06, relheight=0.2)
         self.canvas.bind("<Configure>", self.stretch_small_logo)
 
@@ -81,13 +80,12 @@ class AuthorizationPage(tk.Tk):
 
         # email entry
         ###############################################################################################################
-        email_name_lbl = ctk.CTkLabel(upper_frame, text="Введите email:", font=("Arial", 12), fg_color="pink")
+        email_name_lbl = ctk.CTkLabel(upper_frame, text="Введите email:", font=("Arial", 12))
         email_name_lbl.place(relx=0.5, rely=0.5, anchor="n", relwidth=0.9, relheight=0.05)
 
         self.email_ent = ctk.CTkEntry(
             upper_frame,
             justify="center",
-            fg_color="red",
             validate="key",
             validatecommand=self.entries_validate_method
         )
@@ -99,8 +97,7 @@ class AuthorizationPage(tk.Tk):
         ###############################################################################################################
         password_name_lbl = ctk.CTkLabel(
             upper_frame,
-            text="Введите пароль:",
-            fg_color="pink"
+            text="Введите пароль:"
         )
         password_name_lbl.place(relx=0.5, rely=0.7, anchor="n", relwidth=0.9, relheight=0.05)
 
@@ -108,7 +105,6 @@ class AuthorizationPage(tk.Tk):
             upper_frame,
             show="•",
             justify="center",
-            fg_color="red",
             validate="key",
             validatecommand=self.entries_validate_method
         )
@@ -117,7 +113,7 @@ class AuthorizationPage(tk.Tk):
 
         # down frame
         ###############################################################################################################
-        down_frame = ctk.CTkFrame(content_frame, fg_color="black")
+        down_frame = ctk.CTkFrame(content_frame)
         down_frame.place(relx=0, rely=0.5, anchor="nw", relwidth=1, relheight=0.5)
         ###############################################################################################################
 
@@ -148,17 +144,19 @@ class AuthorizationPage(tk.Tk):
         self.canvas.create_image(0, 0, image=self.resized_tk, anchor="nw")
 
     def validate_entries(self, text):
-        if (len(text) > 0 and len(self.email_ent.get()) > 0) or (len(text) > 0 and len(self.password_ent.get()) > 0):
-            self.submit_btn.configure(state=tk.NORMAL)
-        elif not self.email_ent.get() or not self.password_ent.get() or len(text) == 0:
-            self.submit_btn.configure(state=tk.DISABLED)
+        if len(text) > 1:
+            if self.email_ent.get() and self.password_ent.get():
+                self.submit_btn.configure(state="normal")
+        elif len(text) == 1:
+            if (len(text) > 0 and self.email_ent.get()) or (len(text) > 0 and self.password_ent.get()):
+                self.submit_btn.configure(state="normal")
         else:
-            self.submit_btn.configure(state=tk.NORMAL)
+            self.submit_btn.configure(state=tk.DISABLED)
         return True
 
     def start_connection_to_db(self):
         self.connection = connection.Connection()
-        self.connection.make_connection(user=user, password=password, database=database)
+        self.connection.make_connection(user=db_user, password=db_password, database=db_name)
 
     def find_user_in_db(self, user_email, user_password):
 
