@@ -5,7 +5,7 @@ import customtkinter as ctk
 from PIL import Image, ImageTk
 
 import connection
-from settings import user as db_user, password as db_password, database as db_name
+from settings import user as db_user, password as db_password, database as db_name, background_color
 
 import registration_page
 import user_package.user as user
@@ -21,13 +21,13 @@ class AuthorizationPage(tk.Tk):
         self.title("Авторизация")
         self.state("zoomed")
 
+        self.configure(background=background_color)
+
         # image
         self.small_logo = tk.StringVar(value="img/log_in_logo.png")
 
         self.screen_width = self.winfo_screenwidth()
         self.screen_height = self.winfo_screenheight()
-
-        print(self.screen_width / 2, self.screen_height / 2)
 
         self.minsize(self.screen_width // 2, self.screen_height // 2)
 
