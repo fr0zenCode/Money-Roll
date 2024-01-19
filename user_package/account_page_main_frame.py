@@ -119,7 +119,8 @@ class AccountPageMainFrame(ctk.CTkFrame):
     def cancel_btn_action(self):
         player = self.player
         self.master.destroy()
-        main.MainWindow(player)
+        main_window_page = main_window.MainWindow(player)
+        main_window_page.mainloop()
 
     def submit_btn_action(self):
         pass
