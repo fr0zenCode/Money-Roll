@@ -7,7 +7,7 @@ from PIL import Image, ImageTk
 import connection
 from settings import user as db_user, password as db_password, database as db_name, background_color
 
-import registration_page
+import authorization.registration_page as registration_page
 import user_package.user as user
 import main_window_package.main_window as main_window
 
@@ -39,7 +39,7 @@ class AuthorizationPage(tk.Tk):
 
         # dynamic variables
         self.submit_error_text = tk.StringVar()
-        self.connection = None
+        self.connection = connection.Connection()
         self.player = None
 
         # validate command
@@ -154,17 +154,13 @@ class AuthorizationPage(tk.Tk):
             self.submit_btn.configure(state=tk.DISABLED)
         return True
 
-    def start_connection_to_db(self):
-        self.connection = connection.Connection()
-        self.connection.make_connection(user=db_user, password=db_password, database=db_name)
-
     def find_user_in_db(self, user_email, user_password):
 
         if not user_email or not user_password:
             print("Некорректные данные для входа!")
             return False
 
-        self.start_connection_to_db()
+        self.connection.make_connection(user=db_user, password=db_password, database=db_name)
 
         self.connection.get_cursor().execute(
             f'''
