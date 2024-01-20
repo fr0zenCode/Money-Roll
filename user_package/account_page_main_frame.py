@@ -1,11 +1,13 @@
 from tkinter import *
 import customtkinter as ctk
-
-import tkinter.font as tk_font
 from PIL import Image, ImageTk
 
+import connection
+from settings import (background_color, buttons_background_color, buttons_hover_background_color, areas_background,
+                      user as db_user, password as db_password, database as db_name)
+
 import user_package.user as user
-from main_window_package import main_window
+import main_window_package.main_window as main_window
 
 
 class AccountPageMainFrame(ctk.CTkFrame):
@@ -14,24 +16,24 @@ class AccountPageMainFrame(ctk.CTkFrame):
         super().__init__(master)
 
         self.player = player
+        self.connection = connection.Connection()
 
         self.image_original = Image.open("../img/avatars/default_avatar_image.jpg")
         self.resized_tk = None
 
         # main frame
         ###############################################################################################################
-        content_frame = Frame(background="green")
+        content_frame = ctk.CTkFrame(master, fg_color=background_color)
         content_frame.place(relx=0.5, rely=0.5, anchor=CENTER, relwidth=1, relheight=1)
-        content_frame.pack_propagate(False)
         ###############################################################################################################
 
-        upper_frame = ctk.CTkFrame(content_frame, bg_color="yellow")
-        upper_frame.place(relx=0, rely=0, relwidth=1, relheight=0.85)
+        upper_frame = ctk.CTkFrame(content_frame, fg_color=background_color)
+        upper_frame.place(relx=0, rely=0.05, relwidth=1, relheight=0.8)
 
-        avatar_frame = ctk.CTkFrame(upper_frame, bg_color="red")
-        avatar_frame.place(relx=0, rely=0, relwidth=0.33, relheight=1)
+        avatar_frame = ctk.CTkFrame(upper_frame, fg_color=background_color)
+        avatar_frame.place(relx=0.05, rely=0, relwidth=0.27, relheight=1)
 
-        photo_frame = ctk.CTkFrame(avatar_frame, bg_color="blue")
+        photo_frame = ctk.CTkFrame(avatar_frame, fg_color=background_color)
         photo_frame.place(relwidth=1, relheight=0.75)
 
         self.canvas = Canvas(photo_frame, background="white", bd=0, highlightthickness=0, relief=RIDGE)
@@ -39,11 +41,11 @@ class AccountPageMainFrame(ctk.CTkFrame):
         self.canvas.bind("<Configure>", self.stretch_image)
 
         # combobox
-        self.items_for_combobox = ("<Выберите аватар>", "Озорник", "Лудоман", "Плохой парень")
+        self.items_for_combobox = ("<Выберите аватар>", "Озорник", "Лудоман", "Плохой парень", "MoneyRoll")
         self.combobox_variable, self.combobox_for_avatars = self.create_combobox(avatar_frame, self.items_for_combobox)
 
         # user's data
-        users_data_frame = ctk.CTkFrame(upper_frame, bg_color="green")
+        users_data_frame = ctk.CTkFrame(upper_frame, fg_color=background_color)
         users_data_frame.place(relx=0.33, rely=0, relwidth=0.67, relheight=1, anchor=NW)
 
         self.first_name_variable = StringVar(value=self.player.first_name)
@@ -52,31 +54,32 @@ class AccountPageMainFrame(ctk.CTkFrame):
         self.new_password_variable = StringVar(value="")
         self.confirm_new_password_variable = StringVar(value="")
 
-        self.first_name_ent = (self.create_entry(
-            users_data_frame,
-            "Имя:",
-            "grey").configure(textvariable=self.first_name_variable))
-        self.last_name_ent = self.create_entry(
-            users_data_frame,
-            "Фамилия:",
-            "grey").configure(textvariable=self.last_name_variable)
-        self.current_password_ent = self.create_entry(
-            users_data_frame,
-            "Старый пароль:",
-            "grey").configure(textvariable=self.current_password_variable)
-        self.new_password_ent = self.create_entry(
-            users_data_frame,
-            "Новый пароль:",
-            "grey").configure(textvariable=self.new_password_variable)
-        self.confirm_new_password_ent = self.create_entry(
-            users_data_frame,
-            "Подтверждение пароля:",
-            "grey").configure(textvariable=self.confirm_new_password_variable)
+        self.first_name_frame, self.first_name_ent = self.create_entry(users_data_frame, "Имя:", background_color)
+        self.first_name_frame.place(relx=0.5, rely=0, anchor="n", relwidth=1, relheight=0.1)
+        self.first_name_ent.configure(textvariable=self.first_name_variable)
+
+        self.last_name_frame, self.last_name_ent = self.create_entry(users_data_frame, "Фамилия:", background_color)
+        self.last_name_frame.place(relx=0.5, rely=0.2, anchor="n", relwidth=1, relheight=0.1)
+        self.last_name_ent.configure(textvariable=self.last_name_variable)
+
+        self.current_password_frame, self.current_password_ent = self.create_entry(users_data_frame, "Пароль:",
+                                                                                   background_color)
+        self.current_password_frame.place(relx=0.5, rely=0.4, anchor="n", relwidth=1, relheight=0.1)
+        self.current_password_ent.configure(textvariable=self.current_password_variable)
+
+        self.new_password_frame, self.new_password_ent = self.create_entry(users_data_frame, "Новый пароль:",
+                                                                           background_color)
+        self.new_password_frame.place(relx=0.5, rely=0.6, anchor="n", relwidth=1, relheight=0.1)
+        self.new_password_ent.configure(textvariable=self.new_password_variable)
+
+        self.confirm_new_password_frame, self.confirm_new_password_ent = self.create_entry(users_data_frame,
+                                                                                           "Подтверждение пароля:",
+                                                                                           background_color)
+        self.confirm_new_password_frame.place(relx=0.5, rely=0.8, anchor="n", relwidth=1, relheight=0.1)
+        self.confirm_new_password_ent.configure(textvariable=self.confirm_new_password_variable)
 
         # buttons
         self.cancel_btn, self.submit_btn = self.create_ok_and_cancel_buttons(content_frame)
-
-        self.mainloop()
 
     def stretch_image(self, event):
 
@@ -89,17 +92,21 @@ class AccountPageMainFrame(ctk.CTkFrame):
         self.canvas.create_image(0, 0, image=self.resized_tk, anchor=NW)
 
     def create_ok_and_cancel_buttons(self, parent_frame):
-        bottom_frame = Frame(parent_frame, background="blue")
+
+        bottom_frame = ctk.CTkFrame(parent_frame, fg_color=background_color)
         bottom_frame.place(relx=0, rely=0.85, anchor=NW, relwidth=1, relheight=0.15)
 
-        buttons_frame = Frame(bottom_frame, background="white")
+        buttons_frame = ctk.CTkFrame(bottom_frame, fg_color=background_color)
         buttons_frame.place(relx=0.5, rely=0.5, anchor=CENTER, relwidth=0.3, relheight=0.5)
 
         cancel_btn = ctk.CTkButton(
             buttons_frame,
             text="Отмена",
             corner_radius=10,
-            fg_color="red",
+            fg_color=buttons_background_color,
+            hover_color=buttons_hover_background_color,
+            border_width=2,
+            border_color="red",
             command=self.cancel_btn_action
         )
 
@@ -107,7 +114,10 @@ class AccountPageMainFrame(ctk.CTkFrame):
             buttons_frame,
             text="Принять",
             corner_radius=10,
-            fg_color="green",
+            fg_color=buttons_background_color,
+            hover_color=buttons_hover_background_color,
+            border_width=2,
+            border_color="green",
             command=self.submit_btn_action
         )
 
@@ -123,12 +133,46 @@ class AccountPageMainFrame(ctk.CTkFrame):
         main_window_page.mainloop()
 
     def submit_btn_action(self):
-        pass
 
-    @staticmethod
-    def create_combobox(parent, items: list | tuple):
+        if self.current_password_ent.get() != self.player.get_password():
+            print("Неверный пароль!")
+            return False
 
-        photo_selector_frame = ctk.CTkFrame(parent, bg_color="pink")
+        if self.new_password_ent.get() != self.confirm_new_password_ent.get():
+            print("Пароли не совпадают!")
+            return False
+
+        if self.first_name_ent.get() != self.player.first_name or self.last_name_ent.get() != self.player.last_name:
+            if self.connection.get_connection() is None:
+                self.connection.make_connection(user=db_user, password=db_password, database=db_name)
+                self.connection.get_cursor().execute(f"""
+                UPDATE "authorization-data" 
+                SET 
+                    first_name = '{self.first_name_ent.get()}', last_name = '{self.last_name_ent.get()}'
+                WHERE
+                    login = '{self.player.login}' 
+                    AND password = '{self.player.get_password()}' 
+                    AND email = '{self.player.user_email}';
+                """)
+
+        if self.new_password_ent.get() == self.confirm_new_password_ent.get() != self.current_password_ent.get() != "":
+            if self.connection.get_connection() is None:
+                self.connection.make_connection(user=db_user, password=db_password, database=db_name)
+                self.connection.get_cursor().execute(f"""
+                UPDATE "authorization-data"
+                SET
+                    password = '{self.new_password_ent.get()}'
+                WHERE
+                    login = '{self.player.login}'
+                    AND password = '{self.player.get_password()}'
+                    AND email = '{self.player.user_email}';
+                """)
+        self.connection.get_connection().commit()
+        self.connection.get_connection().close()
+
+    def create_combobox(self, parent, items: list | tuple):
+
+        photo_selector_frame = ctk.CTkFrame(parent, fg_color=background_color)
         photo_selector_frame.place(relx=0, rely=1, relwidth=1, relheight=0.25, anchor=SW)
 
         combobox_variable = StringVar()
@@ -138,24 +182,40 @@ class AccountPageMainFrame(ctk.CTkFrame):
             photo_selector_frame,
             variable=combobox_variable,
             values=items,
-            justify=CENTER
+            justify="center",
+            command=self.combobox_action
         )
 
-        photo_selector_combobox.place(relx=0.5, rely=0.2, anchor=CENTER, relwidth=0.5)
+        photo_selector_combobox.place(relx=0.5, rely=0.15, anchor=CENTER, relwidth=0.5, relheight=0.15)
 
         return combobox_variable, photo_selector_combobox
 
-    @staticmethod
-    def create_font_for_lbl(font_size):
-        font = tk_font.Font(family="Arial", size=int(font_size))
-        return font
+    def combobox_action(self, value):
+
+        image = ""
+
+        if value == "<Выберите аватар>":
+            pass
+        if value == "Лудоман":
+            image = "../img/avatars/ludoman.png"
+        if value == "Озорник":
+            image = "../img/avatars/funny_man.png"
+        if value == "Плохой парень":
+            image = "../img/avatars/bad_boy.png"
+        if value == "MoneyRoll":
+            image = "../img/avatars/default_avatar_image.jpg"
+
+        self.image_original = Image.open(image)
+        resized_image = self.image_original.resize((self.canvas.winfo_width(), self.canvas.winfo_height()))
+
+        self.resized_tk = ImageTk.PhotoImage(resized_image)
+        self.canvas.create_image(0, 0, image=self.resized_tk, anchor=NW)
 
     @staticmethod
     def create_entry(parent_frame, text, bg_color):
-        frame = Frame(parent_frame, background=bg_color)
-        frame.pack(expand=True, fill=BOTH)
+        frame = ctk.CTkFrame(parent_frame, fg_color=background_color)
         frame_lbl = ctk.CTkLabel(frame, text=text, bg_color=bg_color)
         frame_ent = ctk.CTkEntry(frame, bg_color=bg_color, justify=CENTER)
-        frame_lbl.place(relx=0.1, rely=0.5, anchor=W, relwidth=0.5, relheight=0.3)
-        frame_ent.place(relx=0.6, rely=0.5, anchor=W, relwidth=0.3, relheight=0.3)
-        return frame_ent
+        frame_lbl.place(relx=0.1, rely=0.5, anchor=W, relwidth=0.5, relheight=0.5)
+        frame_ent.place(relx=0.6, rely=0.5, anchor=W, relwidth=0.3, relheight=0.5)
+        return frame, frame_ent
