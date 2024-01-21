@@ -12,7 +12,7 @@ import user_package.user as user
 import main_window_package.main_window as main_window
 
 
-class AuthorizationPage(tk.Tk):
+class AuthorizationPage(ctk.CTk):
 
     def __init__(self):
         super().__init__()
@@ -21,7 +21,7 @@ class AuthorizationPage(tk.Tk):
         self.title("Авторизация")
         self.state("zoomed")
 
-        self.configure(background=background_color)
+        self.configure(fg_color=background_color)
 
         # image
         self.small_logo = tk.StringVar(value="img/log_in_logo.png")
@@ -29,7 +29,7 @@ class AuthorizationPage(tk.Tk):
         self.screen_width = self.winfo_screenwidth()
         self.screen_height = self.winfo_screenheight()
 
-        self.minsize(self.screen_width // 2, self.screen_height // 2)
+        self.minsize(int(self.screen_width // 1.7), int(self.screen_height // 1.7))
 
         # cursors
         self.cursor_for_btn = "hand2"
@@ -47,13 +47,13 @@ class AuthorizationPage(tk.Tk):
 
         # main frame
         ###############################################################################################################
-        content_frame = ctk.CTkFrame(self)
+        content_frame = ctk.CTkFrame(self, fg_color=background_color)
         content_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER, relwidth=0.8, relheight=0.8)
         ###############################################################################################################
 
         # users data frame
         ###############################################################################################################
-        upper_frame = ctk.CTkFrame(content_frame)
+        upper_frame = ctk.CTkFrame(content_frame, fg_color=background_color)
         upper_frame.place(relx=0, rely=0, anchor="nw", relwidth=1, relheight=0.5)
 
         page_name = ctk.CTkLabel(upper_frame, text="Авторизация пользователя", font=("Arial", 20))
@@ -61,7 +61,13 @@ class AuthorizationPage(tk.Tk):
 
         # small logo
         ###############################################################################################################
-        self.canvas = tk.Canvas(master=upper_frame, bd=0, highlightthickness=0, relief="ridge")
+        self.canvas = tk.Canvas(
+            master=upper_frame,
+            bd=0,
+            highlightthickness=0,
+            relief="ridge",
+            background=background_color
+        )
         self.canvas.place(relx=0.5, rely=0.2, anchor="n", relwidth=0.06, relheight=0.2)
         self.canvas.bind("<Configure>", self.stretch_small_logo)
 
@@ -113,7 +119,7 @@ class AuthorizationPage(tk.Tk):
 
         # down frame
         ###############################################################################################################
-        down_frame = ctk.CTkFrame(content_frame)
+        down_frame = ctk.CTkFrame(content_frame, fg_color=background_color)
         down_frame.place(relx=0, rely=0.5, anchor="nw", relwidth=1, relheight=0.5)
         ###############################################################################################################
 
@@ -203,20 +209,54 @@ class AuthorizationPage(tk.Tk):
 
     def authorise_user(
             self,
-            user_id,
-            login,
-            first_name,
-            last_name,
-            email,
-            user_password,
-            balance=0,
-            chance_for_big_win=0
-    ):
-        self.player = user.User(login, user_id, first_name, last_name, email, user_password, balance, chance_for_big_win)
-        self.player.auth = True
-        self.destroy()
-        main_window_var = main_window.MainWindow(self.player)
-        main_window_var.mainloop()
+            user_id: int,
+            login: str,
+            first_name: str,
+            last_name: str,
+            email: str,
+            user_password: str,
+            balance: int = 0
+    ) -> None:
+        """
+        RUS:
+        Функция принимает параметры для формирования объекта класса User из модуля user и формирует его.
+        Если все поля заполнены, то, после формирования объекта, окно авторизации закрывается и открывается главное
+        окно (объект класса MainWindow из модуля main_window), в которое передается авторизованный пользователь.
+        В противном случае выводит текст об ошибке.
+
+        ENG:
+        Function takes params for form object of class User from module user and forms it.
+        If all fields are filled, object will be formed and authorization page will be closed. Then main window
+        will be opened (object of class MainWindow from module main_window) which takes authorise user.
+        If Error, error text will be printed in console.
+
+        :param user_id: integer, primary key, user's id
+        :param login: string, user's login
+        :param first_name: string, user's first name
+        :param last_name: string, user's last name
+        :param email: string, user's email
+        :param user_password: string, user's password
+        :param balance: integer, user's balance
+        :return: None
+        """
+
+        if user_id and login and first_name and last_name and email and user_password and balance:
+
+            self.player = user.User(login, user_id, first_name, last_name, email, user_password, balance)
+            self.destroy()
+
+            main_window_var = main_window.MainWindow(self.player)
+            main_window_var.mainloop()
+
+        else:
+
+            error_text: str = (
+                f"""ERROR! 
+                \nPackage: authorizations 
+                \nModule: authorization_page.py 
+                \nError: can't form object User: not all parameters have been given."""
+            )
+            print(error_text)
 
 
 if __name__ == "__main__":
